@@ -2,8 +2,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import nltk
-nltk.download('punkt')
+# import nltk
+# nltk.download('punkt')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -51,10 +51,12 @@ def collate_batch(batch, seq_length=seq_length):
             # pad before
             text_processed = [vocab["<pad>"]]*pad_size + [vocab["<s>"]] + text_processed
             
-        input_ids = torch.tensor(text_list, dtype=torch.int64)
-        labels = torch.tensor(label_list, dtype=torch.int64)
+        text_list.append(text_processed)
         
-        return (input_ids, labels)
+    input_ids = torch.tensor(text_list, dtype=torch.int64)
+    labels = torch.tensor(label_list, dtype=torch.int64)
+    
+    return (input_ids, labels)
     
         
 # %%
@@ -76,12 +78,14 @@ model = TransformerTextCls(vocab_size,
                            dropout=0.1, 
                            device=device)
 
-max_epoch = 20
+model = model.to(device)
+
+epochs = 20
 LR = 0.001
 criterion = nn.CrossEntropyLoss()
 scheduler_step_size = epochs *0.6
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=0.1)
+# scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=0.1)
 
 # %%
 import trainer
@@ -90,6 +94,12 @@ import wandb
 wandb_logger = wandb.init(project="Text-classification",
                           name="Transformer_basic_tokenizer")
 # %%
-train_losses, val_losses = trainer.train(model, train_loader, test_loader, 
-                                         criterion, optimizer, scheduler, 
-                                         device, wandb_logger)
+train_losses, val_losses = trainer.train(model, 
+                                         train_loader, 
+                                         test_loader, 
+                                         criterion, 
+                                         optimizer, 
+                                         scheduler=None, 
+                                         device=device,
+                                         epochs=epochs,
+                                         logger=wandb_logger)

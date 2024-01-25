@@ -56,8 +56,7 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device='cpu'):
     return epoch_train_losses
 
 
-
-def train(model, train_loader, val_loader, criterion, optimizer, scheduler, device, epochs, logger=None):
+def train(model, train_loader, val_loader, criterion, optimizer, scheduler=None, device='cuda', epochs=20, logger=None):
     train_losses = []
     val_losses = []
     
@@ -68,9 +67,20 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, devi
         train_losses.append(train_loss)
         val_losses.append(val_loss)
         
-        scheduler.step()
+        if scheduler:
+            scheduler.step()
+            
         logger.log({"val/loss": train_loss, "val/acc": val_acc})
         logger.log({"train/loss": val_loss})
+        
+        # Save checkpoint
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+        }
+        
+        torch.save(checkpoint, f'{logger.name}.pt')
         
         print(f"Epoch {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}\tVal accuracy: {val_acc:.4f}")
         

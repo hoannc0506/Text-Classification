@@ -17,7 +17,7 @@ class TransformerBlock(nn.Module):
 
     def forward(self, query, key, value):
         attn_output, _ = self.attn(query, key, value)
-        import pdb;pdb.set_trace()
+       
         attn_output = self.dropout_1(attn_output)
         out_1 = self.layernorm_1(query + attn_output)
         ffn_output = self.ffn(out_1)
@@ -50,12 +50,12 @@ class TransformerTextCls(nn.Module):
         self.fc1 = nn.Linear(in_features=embed_dim, out_features=20)
         self.fc2 = nn.Linear(in_features=20, out_features=num_classes)
         self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(p=dropout)
         
     def forward(self, x):
         x = self.embed_layer(x)
         x = self.tranformer_layer(query=x, key=x, value=x)
-        
-        import pdb;pdb.set_trace()
+    
         x = self.pooling(x.permute(0,2,1)).squeeze()
         x = self.dropout(x)
         x = self.fc1(x)
