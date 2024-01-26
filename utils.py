@@ -2,7 +2,7 @@ from torchtext.vocab import build_vocab_from_iterator
 import spacy
 
 # Load the English model
-eng = spacy.load('en_core_web_sm')
+
 
 def load_dataset(data_path):
     data = []
@@ -39,23 +39,6 @@ def build_vocab(data):
     return vocab
 
 
-class Tokenizer(object):
-    def __init__(self, vocab, max_sequence_length):
-        self.vocab = vocab
-        self.max_sequence_length = max_sequence_length
-
-    def __call__(self, question):
-        tokens= [token.text for token in eng.tokenizer(question)]
-        sequence = [self.vocab[token] for token in tokens]
-        
-        if len(sequence) < self.max_sequence_length:
-            sequence += [self.vocab['<pad>']] * (self.max_sequence_length - len(sequence))
-        else:
-            sequence = sequence[:self.max_sequence_length]
-            
-        return sequence
-
-    
 
 if __name__ == "__main__":
     val_data = load_dataset('dataset/vaq2.0.TestImages.txt') 

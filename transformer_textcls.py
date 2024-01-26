@@ -2,8 +2,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# import nltk
-# nltk.download('punkt')
+from utils.vocab_builders import build_basic_vocab
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -16,28 +15,15 @@ train_data, test_data = imdb['train'], imdb['test']
 print(next(iter(train_data)))
 
 # %%
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
-
-# %%
-tokenizer = get_tokenizer("basic_english")
+min_freq = 3
 vocab_size = 20000
 
-def yield_tokens(data_iter):
-    for data in data_iter:
-        yield tokenizer(data["text"])
-        
-# %%
-vocab = build_vocab_from_iterator(yield_tokens(train_data),
-                                  min_freq=3,
-                                  max_tokens=vocab_size,
-                                  specials=["<pad>", "<s>", "<unk>"])
-
-vocab.set_default_index(vocab["<unk>"])
+#%%
+vocab, basic_tokenizer = build_basic_vocab(train_data, min_freq, vocab_size)
 
 # %%
 seq_length = 200
-text_pipeline = lambda x: vocab(tokenizer(x))
+text_pipeline = lambda x: vocab(basic_tokenizer(x))
 
 # %%
 def collate_batch(batch, seq_length=seq_length):
@@ -51,6 +37,9 @@ def collate_batch(batch, seq_length=seq_length):
             # pad before
             text_processed = [vocab["<pad>"]]*pad_size + [vocab["<s>"]] + text_processed
             
+            # pad after
+            # sequence += [self.vocab['<pad>']] * (self.max_sequence_length - len(sequence))
+
         text_list.append(text_processed)
         
     input_ids = torch.tensor(text_list, dtype=torch.int64)
