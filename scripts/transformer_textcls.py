@@ -81,7 +81,10 @@ import trainer
 import wandb
 
 wandb_logger = wandb.init(project="Text-classification",
-                          name="Transformer_basic_tokenizer")
+                          name="Transformer_basic_tokenizer",
+                          config={'save_dir':"results"})
+
+
 # %%
 train_losses, val_losses = trainer.train(model, 
                                          train_loader, 

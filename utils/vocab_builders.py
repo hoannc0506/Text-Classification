@@ -4,7 +4,7 @@ from torchtext.data.utils import get_tokenizer
 
 def yield_tokens(data_iter, tokenizer):
     for data in data_iter:
-        yield tokenizer(data)
+        yield tokenizer(data['text'])
 
 def build_basic_vocab(data, min_freq, vocab_size):
     tokenizer = get_tokenizer("basic_english")
