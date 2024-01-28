@@ -1,10 +1,12 @@
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from utils.vocab_builders import build_basic_vocab
+import os
+import sys
+sys.path.insert(0, os.path.dirname('utils'))
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+from utils.vocab_builders import build_basic_vocab
+device = 'cuda:3' if torch.cuda.is_available() else 'cpu'
 
 # %%
 from datasets import load_dataset
@@ -50,10 +52,21 @@ def collate_batch(batch, seq_length=seq_length):
         
 # %%
 from torch.utils.data import DataLoader
+from utils.dataset_builders import IMDB_Dataset
+
 batch_size = 32
 
-train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, collate_fn=collate_batch, drop_last=True)
-test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False, collate_fn=collate_batch, drop_last=True)
+# create dataloader using collate_fn
+# train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, collate_fn=collate_batch, drop_last=True)
+# test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False, collate_fn=collate_batch, drop_last=True)
+
+# using torch dataset
+train_dataset = IMDB_Dataset(train_data, vocab, basic_tokenizer, seq_length=seq_length)
+val_dataset = IMDB_Dataset(test_data, vocab, basic_tokenizer, seq_length=seq_length)
+
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+test_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
 # %%
 
 from models.transformer import TransformerTextCls
@@ -77,11 +90,11 @@ optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=0.1)
 
 # %%
-import trainer
+from utils import trainer
 import wandb
 
 wandb_logger = wandb.init(project="Text-classification",
-                          name="Transformer_basic_tokenizer",
+                          name="Transformer_basic_tokenizer_dataset_v2",
                           config={'save_dir':"results"})
 
 
