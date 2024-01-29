@@ -2,13 +2,12 @@ import torch
 from torch.utils.data import Dataset
 
 class IMDB_Dataset(Dataset):
-    def __init__(self, data, vocab, tokenizer, seq_length=30):
+    def __init__(self, data, vocab, text_pipeline, seq_length=30):
         self.data = data
         self.vocab = vocab
-        self.tokenizer = tokenizer
         self.seq_length = seq_length
         # text pipeline
-        self.text_pipeline = lambda x: self.vocab(self.tokenizer(x))
+        self.text_pipeline = text_pipeline
         
     def __len__(self):
         return len(self.data)
