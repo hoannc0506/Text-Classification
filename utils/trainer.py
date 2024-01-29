@@ -71,8 +71,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler=None,
         if scheduler:
             scheduler.step()
             
-        logger.log({"val/loss": train_loss, "val/acc": val_acc})
-        logger.log({"train/loss": val_loss})
+        logger.log({"val/loss": val_loss, "val/acc": val_acc})
+        logger.log({"train/loss": train_loss})
         
         # Save checkpoint
         checkpoint = {
