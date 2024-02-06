@@ -1,5 +1,12 @@
-# Text2labels projects
+# Text classification projects
 
-## Text classification
-- Text -> indices vector -> embedding_layer -> tensor_data
-    + Training embedding_layer (like embedding matrix but `trainable`)
+## Dataset 
+- IMDB ("imdb"): 
+- Twitter :
+- Banking ("bank77")
+
+## Models
+- Transformer from scratch
+- BERT, GPT-2, BART
+
+# Results
