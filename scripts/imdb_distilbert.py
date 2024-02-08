@@ -26,7 +26,7 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 from transformers import AutoModelForSequenceClassification
 
 model = AutoModelForSequenceClassification.from_pretrained(pretrain_name,
-                                                           num_labels=2,,
+                                                           num_labels=2,
                                                            id2label=id2label,
                                                            label2id=label2id)
 
@@ -52,7 +52,7 @@ training_args = TrainingArguments(
     weight_decay=0.01,
     evaluation_strategy="epoch",
     save_strategy="epoch",
-    load_best_model_at_end=True
+    load_best_model_at_end=True,
 )
 
 trainer = Trainer(
