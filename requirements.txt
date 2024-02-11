@@ -1,0 +1,10 @@
+dataset
+evaluate
+spacy
+tokenizers
+torchinfo
+tqdm
+transformers
+wandb
+# torchtext==0.16.0
+scikit-learn

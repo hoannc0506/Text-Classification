@@ -45,16 +45,16 @@ model = TransformerTextCls(vocab_size,
 
 model = model.to(device)
 
-epochs = 20
-LR = 0.001
+epochs = 10
+LR = 5e-5
 criterion = nn.CrossEntropyLoss()
 scheduler_step_size = epochs *0.6
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-# scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=0.1)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=0.1)
 
 wandb_logger = wandb.init(project="Text-classification",
                           name="Transformer_basic_tokenizer",
-                          config={'save_dir':"results"})
+                          config={'save_dir':"results/imdb_transformer_scratch"})
 
 
 train_losses, val_losses = trainer.train(model, 
