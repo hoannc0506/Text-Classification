@@ -1,8 +1,8 @@
 # Text classification projects
 
 ## Dataset 
-- IMDB ("imdb")
-- Banking ("bank77")
+- IMDB sentiment analysis: [imdb](https://huggingface.co/datasets/imdb)
+- Banking Intent classification: [bank77](https://huggingface.co/datasets/banking77)
 - [Twitter sentiment analysis](https://huggingface.co/datasets/carblacac/twitter-sentiment-analysis)
 - [Vietnamese sentiment analysis](https://github.com/congnghia0609/ntc-scv)
 
@@ -12,3 +12,13 @@
 - FLAN T5 (prompting)
 
 # Results
+- IMDB sentiment analysis:
+    - Trasformer from scratch
+    - Distil BERT hugging face
+- Banking Intent classification:
+    - Fine-tune with custom pipeline
+    - Fine-tune with hugging face pipline
+- Twitter sentiment analysis:
+    - Fine-tune with hugging face pipline
+    - Instruction tuning (prompting) FLAN T5 
+
