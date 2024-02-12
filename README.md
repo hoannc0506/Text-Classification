@@ -1,12 +1,14 @@
 # Text classification projects
 
 ## Dataset 
-- IMDB ("imdb"): 
-- Twitter :
+- IMDB ("imdb")
 - Banking ("bank77")
+- [Twitter sentiment analysis](https://huggingface.co/datasets/carblacac/twitter-sentiment-analysis)
+- [Vietnamese sentiment analysis](https://github.com/congnghia0609/ntc-scv)
 
 ## Models
 - Transformer from scratch
-- BERT, GPT-2, BART
+- BERT
+- FLAN T5 (prompting)
 
 # Results
