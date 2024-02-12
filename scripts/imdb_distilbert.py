@@ -1,72 +1,86 @@
+import os
 import torch
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
 from datasets import load_dataset
+import evaluate
+import numpy as np
+import wandb
 
-imdb = load_dataset("imdb")
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForSequenceClassification,
+    TrainingArguments,
+    Trainer
+    )
+
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+dataset_name = "imdb"
+raw_dataset = load_dataset(dataset_name)
+print(len(raw_dataset['train']), len(raw_dataset['test']))
 
 id2label = {0: "NEGATIVE", 1: "POSITIVE"}
 label2id = {"NEGATIVE": 0, "POSITIVE": 1}
 
 
-from transformers import AutoTokenizer
-
 pretrain_name = "distilbert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(pretrain_name)
 
-def preprocess_funtion(examples):
-    return tokenizer(examples['text'], truncation=True)
+preprocess_funtion = lambda batch: tokenizer(batch['text'], 
+                                             padding="max_length",
+                                             truncation=True,
+                                             return_tensors='pt')
 
-tokenized_imdb = imdb.map(preprocess_funtion, batched=True, num_proc=10)
-
-from transformers import DataCollatorWithPadding
-
-data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
-from transformers import AutoModelForSequenceClassification
+tokenized_dataset = raw_dataset.map(preprocess_funtion, batched=True, num_proc=10)
 
 model = AutoModelForSequenceClassification.from_pretrained(pretrain_name,
                                                            num_labels=2,
                                                            id2label=id2label,
                                                            label2id=label2id)
 
-import numpy as np
-import evaluate
-
-accuracy = evaluate.load("accuracy")
+# prepare metric
+metric = evaluate.load("f1")
 
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     predictions = np.argmax(predictions, axis=1)
-    return accuracy.compute(predictions=predictions, labels=labels)
+    
+    return metric.compute(predictions=predictions, 
+                          references=labels, 
+                          average="weighted")
 
 
-from transformers import TrainingArguments, Trainer
+with wandb.init(project="text_classification") as run:
+    save_dir = "results/imdb_distilbert_hf"
+    # define training parameters
+    training_args = TrainingArguments(
+        output_dir=save_dir,
+        per_device_train_batch_size=64,
+        per_device_eval_batch_size=64,
+        learning_rate=5e-5,
+        num_train_epochs=10,
+        # torch_compile=True, # optimizations
+        optim="adamw_torch_fused", # optimizer
+        # logging & evaluation strategies
+        logging_dir=f"{save_dir}/logs",
+        logging_strategy="steps",
+        logging_steps=500,
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
+        save_total_limit=1,
+        load_best_model_at_end=True,
+        metric_for_best_model="f1",
+        # wandb logging
+        report_to="wandb",
+        run_name="imdb-distilbert"
+    )
 
-training_args = TrainingArguments(
-    output_dir="results",
-    learning_rate=2e-5,
-    per_device_train_batch_size=32,
-    per_device_eval_batch_size=32,
-    num_train_epochs=20,
-    weight_decay=0.01,
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
-    load_best_model_at_end=True,
-)
-
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_imdb['train'],
-    eval_dataset=tokenized_imdb['test'],
-    tokenizer=tokenizer,
-    data_collator=data_collator,
-    compute_metrics=compute_metrics,
-)
-
-trainer.train()
-
-
-trainer.evaluate(tokenized_imdb["test"])
-
+    # Create a Trainer instance
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_dataset["train"],
+        eval_dataset=tokenized_dataset["test"],
+        compute_metrics=compute_metrics,
+    )
+    trainer.train()
+    

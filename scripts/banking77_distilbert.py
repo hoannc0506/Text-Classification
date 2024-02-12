@@ -40,7 +40,7 @@ model = AutoModelForSequenceClassification.from_pretrained(model_name,
 
 model.to(device)
 
-# prepaer metric
+# prepare metric
 metric = evaluate.load("f1")
 
 def compute_metrics(eval_pred):
