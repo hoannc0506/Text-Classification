@@ -1,8 +1,8 @@
 # Text classification projects
 
 ## Dataset 
-- IMDB sentiment analysis: [imdb](https://huggingface.co/datasets/imdb)
-- Banking Intent classification: [bank77](https://huggingface.co/datasets/banking77)
+- [IMDB sentiment analysis](https://huggingface.co/datasets/imdb)
+- [Banking Intent classification](https://huggingface.co/datasets/banking77)
 - [Twitter sentiment analysis](https://huggingface.co/datasets/carblacac/twitter-sentiment-analysis)
 - [Vietnamese sentiment analysis](https://github.com/congnghia0609/ntc-scv)
 
