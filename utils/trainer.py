@@ -10,8 +10,8 @@ def evaluate(model, dataloader, criterion, device):
     val_loss = 0
     
     with torch.no_grad():
-        for batch_idx, (inputs, labels) in tqdm(enumerate(dataloader)):
-            inputs, labels = inputs.to(device), labels.to(device)
+        for batch_idx, batch in tqdm(enumerate(dataloader)):
+            inputs, labels = batch["input_ids"], batch["label"]
             outputs = model(inputs)
             
             loss = criterion(outputs, labels)
@@ -35,7 +35,9 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device='cpu'):
     model = model.train()
     epoch_train_losses = 0
     
-    for batch_idx, (inputs, labels) in tqdm(enumerate(dataloader)):
+    import pdb;pdb.set_trace()
+    for batch_idx, batch in tqdm(enumerate(dataloader)):
+        inputs, labels = batch["input_ids"], batch["label"]
         inputs, labels = inputs.to(device), labels.to(device)
         outputs = model(inputs)
         
