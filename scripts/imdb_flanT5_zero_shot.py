@@ -36,14 +36,6 @@ tokenized_dataset = dataset.map(tokenize_function, num_proc=20)
 tokenized_dataset = tokenized_dataset.remove_columns('text')
 tokenized_dataset
 
-# import pdb; pdb.set_trace()
-
-# # Convert to Hugging Face Dataset format
-# tokenized_dataset = Dataset.from_dict({
-#     'input_ids': tokenized_dataset['input_ids'],
-#     'label': tokenized_dataset['label'],
-# })
-
 # Create DataCollator
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
@@ -62,12 +54,22 @@ metric = evaluate.load("f1")
 model.eval()
 
 # Iterate through DataLoader
+all_labels = []
+all_predictions = []
 with torch.no_grad():
-    for batch in dataloader:
-        import pdb;pdb.set_trace()
-        input_ids = batch['input_ids']
-        labels = batch['labels']
+    for idx, batch in enumerate(tqdm(dataloader)):
         # Do whatever processing you need
-        print(input_ids.shape, labels.shape)  # Example usage
+        input_ids, labels = batch["input_ids"], batch['labels']
+        input_ids = input_ids.squeeze(1).to(device)
+        outputs = model.generate(input_ids)
+        predictions = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        
+        all_predictions = all_predictions + [label2id[x] for x in predictions]
+        all_labels = all_labels + labels.tolist()
+          # Example usage
 
-        break
+    f1_score = metric.compute(references=all_labels, 
+                              predictions=all_predictions,
+                              average="weighted")
+
+    print(f1_score)
