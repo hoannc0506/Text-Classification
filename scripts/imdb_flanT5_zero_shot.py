@@ -1,7 +1,7 @@
 from transformers import T5Tokenizer, T5ForConditionalGeneration
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from torch.utils.data import DataLoader
-from transformers import Trainer, TrainingArguments, DataCollatorWithPadding
+from transformers import DataCollatorWithPadding
 from tqdm import tqdm
 import torch
 import numpy as np
@@ -13,7 +13,7 @@ id2label = {0: "negative", 1: "positive"}
 label2id = {"negative": 0, "positive": 1}
 
 # load model
-device = "cuda:2"
+device = "cuda:1"
 model_name = "google/flan-t5-small"
 tokenizer = T5Tokenizer.from_pretrained(model_name)
 model = T5ForConditionalGeneration.from_pretrained(model_name, device_map=device)
@@ -33,29 +33,41 @@ tokenize_function = lambda batch: tokenizer(
 
 # tokenize dataset
 tokenized_dataset = dataset.map(tokenize_function, num_proc=20)
+tokenized_dataset = tokenized_dataset.remove_columns('text')
+tokenized_dataset
+
+# import pdb; pdb.set_trace()
+
+# # Convert to Hugging Face Dataset format
+# tokenized_dataset = Dataset.from_dict({
+#     'input_ids': tokenized_dataset['input_ids'],
+#     'label': tokenized_dataset['label'],
+# })
 
 # Create DataCollator
-# data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+# Define batch size
+batch_size = 64
 
 # Create DataLoader
 dataloader = DataLoader(
     tokenized_dataset, 
-    batch_size=64, 
-    # collate_fn=data_collator,
-    shuffle=True
+    batch_size=batch_size, 
+    collate_fn=data_collator,
+    shuffle=False
 )
 
-# init metric
 metric = evaluate.load("f1")
 model.eval()
+
+# Iterate through DataLoader
 with torch.no_grad():
-    for idx, batch in enumerate(tqdm(dataloader)):
-        input_ids = torch.tensor(batch['input_ids']
-        
-        attention_mask = batch['attention_mask']
+    for batch in dataloader:
+        import pdb;pdb.set_trace()
+        input_ids = batch['input_ids']
+        labels = batch['labels']
         # Do whatever processing you need
-        print(input_ids.shape, attention_mask.shape)
+        print(input_ids.shape, labels.shape)  # Example usage
 
         break
-
-    
