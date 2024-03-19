@@ -6,19 +6,22 @@
 - [Twitter sentiment analysis](https://huggingface.co/datasets/carblacac/twitter-sentiment-analysis)
 <!-- - [Vietnamese sentiment analysis](https://github.com/congnghia0609/ntc-scv) -->
 
-- [Penn Tree Bank]
+<!-- - [Penn Tree Bank] -->
 
 ## Models
 - Transformer from scratch
-- BERT
+- DistilBERT
 - FLAN T5 (prompting)
 
-## To-Do
+## Results
 - **IMDB sentiment analysis**:
-    - [ ] Trasformer from scratch: 
-    - [ ] Distil BERT hugging face
-    - [x] Zero-shot instruction prompting: FLAN T5 : f1 = 90.75%
-    - [ ] Random/Top-K n-shot prompting
+    - [x] Trasformer from scratch: F1 = 79.19%
+    - [x] Distil BERT hugging face: 93%
+    - [x] Zero-shot prompting: FLAN T5 : f1 = 90.75%
+
+## To-Do
+
+    
 - Banking Intent classification:
     - Fine-tune with custom pipeline
     - Fine-tune with hugging face pipline
