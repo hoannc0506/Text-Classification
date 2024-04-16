@@ -1,4 +1,4 @@
-# Text classification projects
+# Sentiment Analysis
 
 ## Dataset 
 - [IMDB sentiment analysis](https://huggingface.co/datasets/imdb)
@@ -15,21 +15,18 @@
 
 ## Results
 - **IMDB sentiment analysis**:
-    - [x] Trasformer from scratch: F1 = 79.19%
-    - [x] Distil BERT hugging face: 93%
-    - [x] Zero-shot prompting: FLAN T5 : f1 = 90.75%
+| Model | F1 |
+| ----------- | ----------- |
+| Trasformer from scratch | 79.19% |
+| DistilBERT | 93% |
+| Zero-shot prompting | 90.75% |
+
 
 ## To-Do
-
-    
 - Banking Intent classification:
     - Fine-tune with custom pipeline
     - Fine-tune with hugging face pipline
 - Twitter sentiment analysis:
     - Fine-tune with hugging face pipline
-    - Instruction tuning (prompting) FLAN T5 
-
-# Token-based Text classification
-- [ ] POS
-- [ ] Medical NER
+    - Instruction tuning (prompting) FLAN T5
 
