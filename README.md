@@ -14,7 +14,7 @@
 - FLAN T5 (prompting)
 
 ## Results
-- **IMDB sentiment analysis**:
+**IMDB sentiment analysis**
 | Model | F1 |
 | ----------- | ----------- |
 | Trasformer from scratch | 79.19% |
